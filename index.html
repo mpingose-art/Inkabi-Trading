@@ -1,0 +1,54 @@
+<!-- Live Market Data Script -->
+  <script>
+    (function() {
+      const API_KEY = "jbck0g";
+      const portfolio = [
+        { ticker: "INTC", shares: 0.4007 },
+        { ticker: "MU", shares: 0.0271 },
+        { ticker: "NVDA", shares: 0.2594 },
+        { ticker: "SNDK", shares: 0.0087 },
+        { ticker: "SPCX", shares: 0.2346 }
+      ];
+
+      async function fetchLiveMarketData() {
+        for (let item of portfolio) {
+          if (item.ticker === "SPCX") continue;
+
+          try {
+            const apiUrl = `https://finnhub.io/api/v1/quote?symbol=${item.ticker}&token=${API_KEY}`;
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
+            
+            let response = await fetch(proxyUrl);
+            let json = await response.json();
+            
+            if (json && json.contents) {
+              // Safely parse the inner contents string returned by the proxy
+              let data = typeof json.contents === "string" ? JSON.parse(json.contents) : json.contents;
+
+              if (data && typeof data.c === "number") {
+                let livePrice = data.c;
+                let currentValue = item.shares * livePrice;
+
+                let rows = document.querySelectorAll("tr");
+                rows.forEach(row => {
+                  let tickerCell = row.querySelector("td:nth-child(2)");
+                  if (tickerCell && tickerCell.innerText.trim() === item.ticker) {
+                    let cells = row.querySelectorAll("td");
+                    if (cells.length >= 7) {
+                      cells[5].innerText = `$${livePrice.toFixed(2)}`;
+                      cells[6].innerText = `$${currentValue.toFixed(2)}`;
+                    }
+                  }
+                });
+              }
+            }
+          } catch (err) {
+            console.error(`Live fetch error for ${item.ticker}:`, err);
+          }
+        }
+      }
+
+      fetchLiveMarketData();
+      setInterval(fetchLiveMarketData, 30000);
+    })();
+  </script>
