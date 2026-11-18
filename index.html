@@ -98,7 +98,7 @@
 
   <!-- Live Market Data Script -->
   <script>
-    const API_KEY = "dbudirpr01qv51jbck1g"; // Full webhook/API token context
+    const API_KEY = "dbudirpr01qv51jbck00dbudirpr01qv51jbck0g";
     const portfolio = [
       { ticker: "INTC", shares: 0.4007 },
       { ticker: "MU", shares: 0.0271 },
@@ -116,7 +116,6 @@
             let livePrice = data.c;
             let currentValue = item.shares * livePrice;
 
-            // Find the row for this ticker and update cells directly
             let row = document.querySelector(`tr[data-ticker="${item.ticker}"]`);
             if (row) {
               row.querySelector(".price").innerText = `$${livePrice.toFixed(2)}`;
@@ -129,7 +128,6 @@
       }
     }
 
-    // Run immediately, then refresh every 30 seconds
     fetchLivePrices();
     setInterval(fetchLivePrices, 30000);
   </script>
