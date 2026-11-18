@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iinkabi Trading and Investments</title>
+  <style>
+    body { font-family: monospace; background: #121212; color: #00ffcc; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #333; padding: 10px; text-align: left; }
+    th { background: #1e1e1e; color: #ffffff; }
+  </style>
+</head>
+<body>
+
+  <h2>📈 Iinkabi Trading and Investments</h2>
+  <p>NASDAQ · USD | Auto-syncing live market prices...</p>
+
+  <h3>Holdings Detail</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Company</th>
+        <th>Ticker</th>
+        <th>Shares</th>
+        <th>Avg Buy</th>
+        <th>Cost</th>
+        <th>Price</th>
+        <th>Value</th>
+        <th>Day</th>
+        <th>P/L</th>
+        <th>52W</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Intel</td>
+        <td>INTC</td>
+        <td>0.4007</td>
+        <td>$119.77</td>
+        <td>$48.00</td>
+        <td>$0.00</td>
+        <td>$0.00</td>
+        <td>-</td>
+        <td>-</td>
+        <td>$32.89–$142.35</td>
+      </tr>
+      <tr>
+        <td>Micron Technology</td>
+        <td>MU</td>
+        <td>0.0271</td>
+        <td>$1104.92</td>
+        <td>$30.00</td>
+        <td>$0.00</td>
+        <td>$0.00</td>
+        <td>-</td>
+        <td>-</td>
+        <td>$192.59–$1255.00</td>
+      </tr>
+      <tr>
+        <td>NVIDIA</td>
+        <td>NVDA</td>
+        <td>0.2594</td>
+        <td>$192.71</td>
+        <td>$50.00</td>
+        <td>$0.00</td>
+        <td>$0.00</td>
+        <td>-</td>
+        <td>-</td>
+        <td>$164.27–$243.37</td>
+      </tr>
+      <tr>
+        <td>Sandisk</td>
+        <td>SNDK</td>
+        <td>0.0087</td>
+        <td>$2139.84</td>
+        <td>$18.65</td>
+        <td>$0.00</td>
+        <td>$0.00</td>
+        <td>-</td>
+        <td>-</td>
+        <td>$183.00–$2354.39</td>
+      </tr>
+      <tr>
+        <td>Space Exploration Technologies</td>
+        <td>SPCX</td>
+        <td>0.2346</td>
+        <td>$183.25</td>
+        <td>$43.00</td>
+        <td>$141.70</td>
+        <td>$33.24</td>
+        <td>-</td>
+        <td>-</td>
+        <td>$104.83–$225.64</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Live Market Data Script -->
+  <script>
+    (function() {
+      const API_KEY = "jbck0g";
+      const portfolio = [
+        { ticker: "INTC", shares: 0.4007 },
+        { ticker: "MU", shares: 0.0271 },
+        { ticker: "NVDA", shares: 0.2594 },
+        { ticker: "SNDK", shares: 0.0087 },
+        { ticker: "SPCX", shares: 0.2346 }
+      ];
+
+      async function fetchLiveMarketData() {
+        for (let item of portfolio) {
+          if (item.ticker === "SPCX") continue;
+
+          try {
+            const apiUrl = `https://finnhub.io/api/v1/quote?symbol=${item.ticker}&token=${API_KEY}`;
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
+            
+            let response = await fetch(proxyUrl);
+            let proxyData = await response.json();
+            
+            if (proxyData && proxyData.contents) {
+              let data = JSON.parse(proxyData.contents);
+
+              if (data && data.c) {
+                let livePrice = data.c;
+                let currentValue = item.shares * livePrice;
+
+                let rows = document.querySelectorAll("tr");
+                rows.forEach(row => {
+                  let tickerCell = row.querySelector("td:nth-child(2)");
+                  if (tickerCell && tickerCell.innerText.trim() === item.ticker) {
+                    let cells = row.querySelectorAll("td");
+                    if (cells.length >= 7) {
+                      cells[5].innerText = `$${livePrice.toFixed(2)}`;
+                      cells[6].innerText = `$${currentValue.toFixed(2)}`;
+                    }
+                  }
+                });
+              }
+            }
+          } catch (err) {
+            console.error(`Live fetch error for ${item.ticker}:`, err);
+          }
+        }
+      }
+
+      fetchLiveMarketData();
+      setInterval(fetchLiveMarketData, 30000);
+    })();
+  </script>
+
+</body>
+</html>
